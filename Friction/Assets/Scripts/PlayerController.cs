@@ -43,7 +43,7 @@ namespace Assets.Scripts
                 GameOver.text = "Game Over";
             }
 
-            
+
 
             if (!String.IsNullOrEmpty(JumpCooldownStatus.text))
             {
@@ -64,19 +64,29 @@ namespace Assets.Scripts
                 if (playerCollider != null)
                 {
                     var grounds = GameObject.FindGameObjectsWithTag("Ground");
+
                     if (grounds.Any())
                     {
-                        foreach (var ground in grounds.Where(x => x.activeSelf))
-                        {
-                            if (playerCollider.IsTouching(ground.GetComponent<BoxCollider2D>()))
-                            {
-                                var groundMesh = ground.gameObject.GetComponent<MeshRenderer>();
-                                var playerMesh = player.gameObject.GetComponent<MeshRenderer>();
+                        float? distance = null;
+                        GameObject relevantGround = null;
 
-                                if (groundMesh.material.color == playerMesh.material.color)
-                                {
-                                    _applyFriction = false;
-                                }
+                        foreach (var ground in grounds)
+                        {
+                            var currentDistance = Vector2.Distance(ground.transform.position, player.transform.position);
+                            if (!distance.HasValue || currentDistance <= distance.Value)
+                            {
+                                distance = currentDistance;
+                                relevantGround = ground;
+                            }
+                        }
+
+                        if (relevantGround != null)
+                        {
+                            if (playerCollider.IsTouching(relevantGround.GetComponent<BoxCollider2D>()))
+                            {
+                                var groundMesh = relevantGround.gameObject.GetComponent<MeshRenderer>();
+                                var playerMesh = player.gameObject.GetComponent<MeshRenderer>();
+                                _applyFriction = groundMesh.material.color != playerMesh.material.color;
                             }
                         }
                     }
