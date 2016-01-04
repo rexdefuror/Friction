@@ -35,8 +35,12 @@ namespace Assets.Scripts.Utility
         {
             try
             {
-                player.velocity = new Vector2(player.velocity.x, jumpHeight);
-                return true;
+                if (player.IsGrounded())
+                {
+                    player.velocity = new Vector2(player.velocity.x, jumpHeight);
+                    return true;
+                }
+                return false;
             }
             catch (Exception)
             {
@@ -48,13 +52,22 @@ namespace Assets.Scripts.Utility
         {
             try
             {
-                player.transform.localScale -= new Vector3(0, frictionDamage, 0);
-                return true;
+                if (player.IsGrounded())
+                {
+                    player.transform.localScale -= new Vector3(0, frictionDamage, 0);
+                    return true;
+                }
+                return false;
             }
             catch (Exception)
             {
                 return false;
             }
+        }
+
+        public static bool IsGrounded(this Rigidbody2D player)
+        {
+            return Math.Abs(player.velocity.y) < 0.01f;
         }
     }
 }
